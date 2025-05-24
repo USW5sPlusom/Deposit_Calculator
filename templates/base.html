@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Калькулятор сложного процента</title>
+    <style>
+        :root {
+            --neon-blue: #08f;
+            --neon-purple: #a0f;
+            --neon-pink: #f0f;
+            --neon-green: #0f8;
+            --dark-bg: #0a0a12;
+            --darker-bg: #050508;
+            --card-bg: rgba(20, 20, 30, 0.7);
+            --text-light: #f0f0ff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(0, 136, 255, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(160, 0, 255, 0.1) 0%, transparent 40%);
+            z-index: -1;
+            pointer-events: none;
+            animation: bg-pulse 15s infinite alternate;
+        }
+
+        @keyframes bg-pulse {
+            0% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .calculator-container {
+            width: 100%;
+            max-width: 500px;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .neon-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(0, 136, 255, 0.2);
+            border-radius: 20px;
+            padding: 2.5rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s ease;
+        }
+
+        .neon-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to bottom right,
+                transparent, transparent,
+                rgba(0, 136, 255, 0.1),
+                rgba(160, 0, 255, 0.1)
+            );
+            transform: rotate(30deg);
+            z-index: -1;
+        }
+
+        .neon-card:hover {
+            border-color: var(--neon-blue);
+            box-shadow: 
+                0 0 20px rgba(0, 136, 255, 0.3),
+                0 0 40px rgba(160, 0, 255, 0.2);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: white;
+            text-shadow: 0 0 10px rgba(0, 136, 255, 0.5);
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 25%;
+            width: 50%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
+            border-radius: 3px;
+            box-shadow: 0 0 10px var(--neon-blue);
+            animation: neon-glow 1.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes neon-glow {
+            from {
+                opacity: 0.7;
+                box-shadow: 0 0 5px var(--neon-blue);
+            }
+            to {
+                opacity: 1;
+                box-shadow: 0 0 15px var(--neon-blue), 0 0 20px var(--neon-purple);
+            }
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 500;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(10, 10, 20, 0.5);
+            border: 1px solid rgba(0, 136, 255, 0.3);
+            border-radius: 10px;
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 10px rgba(0, 136, 255, 0.3);
+        }
+
+        .input-group input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            margin-top: 1rem;
+            z-index: 1;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--neon-purple), var(--neon-blue));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 136, 255, 0.3);
+        }
+
+        .btn:hover::before {
+            opacity: 1;
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        .result {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            border: 1px solid rgba(0, 136, 255, 0.2);
+            text-align: center;
+            font-size: 1.2rem;
+            line-height: 1.6;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+        }
+
+        .result.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .result img {
+            max-width: 100%;
+            margin-top: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .nav-button {
+            display: inline-block;
+            padding: 0.8rem 1.5rem;
+            margin: 1rem 0.5rem 0;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .next-button {
+            background: linear-gradient(135deg, var(--neon-green), #0a5);
+            color: var(--dark-bg);
+        }
+
+        .back-button {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .nav-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .floating-particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(0, 136, 255, 0.5);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        @media (max-width: 600px) {
+            .calculator-container {
+                padding: 1rem;
+            }
+            
+            .neon-card {
+                padding: 1.5rem;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-particles" id="particles"></div>
+    
+    <div class="calculator-container">
+        <div class="neon-card">
+            <h1>Neon Compound Calculator</h1>
+            
+            <form id="calculator-form">
+                <div class="input-group">
+                    <label for="initial-amount">Начальная сумма (руб.)</label>
+                    <input type="number" id="initial-amount" placeholder="10000" required>
+                </div>
+                
+                <div class="input-group">
+                    <label for="annual-rate">Годовая ставка (%)</label>
+                    <input type="number" id="annual-rate" placeholder="10" step="0.1" required>
+                </div>
+                
+                <div class="input-group">
+                    <label for="years">Срок инвестиций (лет)</label>
+                    <input type="number" id="years" placeholder="5" required>
+                </div>
+                
+                <div class="input-group">
+                    <label for="monthly-deposit">Ежемесячное пополнение (руб.)</label>
+                    <input type="number" id="monthly-deposit" placeholder="1000">
+                </div>
+                
+                <button type="submit" class="btn" id="calculate-btn">
+                    <span>Рассчитать</span>
+                </button>
+            </form>
+            
+            <div class="result" id="result"></div>
+            
+            <a href="/next_page" class="nav-button next-button">О разработчике</a>
+        </div>
+    </div>
+
+    <script>
+        // Плавающие частицы
+        function createParticles() {
+            const container = document.getElementById('particles');
+            const particleCount = Math.floor(window.innerWidth / 10);
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                const size = Math.random() * 5 + 1;
+                const posX = Math.random() * window.innerWidth;
+                const posY = Math.random() * window.innerHeight;
+                const delay = Math.random() * 5;
+                const duration = Math.random() * 10 + 10;
+                const opacity = Math.random() * 0.5 + 0.1;
+                
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${posX}px`;
+                particle.style.top = `${posY}px`;
+                particle.style.animationDelay = `${delay}s`;
+                particle.style.animationDuration = `${duration}s`;
+                particle.style.opacity = opacity;
+                
+                // Случайный цвет частицы
+                const colors = ['rgba(0, 136, 255, 0.5)', 'rgba(160, 0, 255, 0.5)', 'rgba(0, 248, 136, 0.5)'];
+                const randomColor = colors[Math.floor(Math.random() * colors.length)];
+                particle.style.backgroundColor = randomColor;
+                
+                container.appendChild(particle);
+                
+                // Анимация движения
+                animateParticle(particle);
+            }
+        }
+        
+        function animateParticle(particle) {
+            const startX = parseFloat(particle.style.left);
+            const startY = parseFloat(particle.style.top);
+            
+            const angle = Math.random() * Math.PI * 2;
+            const distance = Math.random() * 100 + 50;
+            const duration = Math.random() * 10000 + 10000;
+            
+            const endX = startX + Math.cos(angle) * distance;
+            const endY = startY + Math.sin(angle) * distance;
+            
+            particle.animate([
+                { transform: `translate(0, 0)` },
+                { transform: `translate(${endX - startX}px, ${endY - startY}px)` }
+            ], {
+                duration: duration,
+                iterations: Infinity,
+                direction: 'alternate',
+                easing: 'ease-in-out'
+            });
+        }
+        
+        // Калькулятор
+        document.getElementById('calculator-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            calculate();
+        });
+        
+        function calculate() {
+            const initialAmount = parseFloat(document.getElementById('initial-amount').value);
+            const annualRate = parseFloat(document.getElementById('annual-rate').value) / 100;
+            const years = parseInt(document.getElementById('years').value);
+            const monthlyDeposit = parseFloat(document.getElementById('monthly-deposit').value) || 0;
+            
+            if (isNaN(initialAmount) || isNaN(annualRate) || isNaN(years)) {
+                showResult('Пожалуйста, заполните все обязательные поля', false);
+                return;
+            }
+            
+            // Расчет с ежемесячным пополнением
+            let total = initialAmount;
+            const monthlyRate = annualRate / 12;
+            const months = years * 12;
+            
+            for (let i = 0; i < months; i++) {
+                total = total * (1 + monthlyRate) + monthlyDeposit;
+            }
+            
+            const profit = total - initialAmount - (monthlyDeposit * months);
+            
+            showResult(`
+                <strong>Итоговая сумма:</strong> ${total.toFixed(2)} руб.<br>
+                <strong>Прибыль:</strong> ${profit.toFixed(2)} руб.<br>
+                <strong>Всего вложено:</strong> ${(initialAmount + monthlyDeposit * months).toFixed(2)} руб.
+            `, true);
+        }
+        
+        function showResult(message, success) {
+            const resultElement = document.getElementById('result');
+            resultElement.innerHTML = message;
+            resultElement.style.color = success ? 'var(--neon-green)' : 'var(--neon-pink)';
+            resultElement.classList.add('show');
+            
+            // Анимация появления
+            setTimeout(() => {
+                resultElement.style.opacity = '1';
+                resultElement.style.transform = 'translateY(0)';
+            }, 10);
+        }
+        
+        // Инициализация
+        window.addEventListener('load', () => {
+            createParticles();
+            
+            // Анимация появления карточки
+            const card = document.querySelector('.neon-card');
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+                card.style.transition = 'all 0.5s ease-out';
+            }, 100);
+        });
+        
+        // Адаптация частиц при изменении размера окна
+        window.addEventListener('resize', () => {
+            const particles = document.getElementById('particles');
+            particles.innerHTML = '';
+            createParticles();
+        });
+    </script>
+</body>
+</html>
