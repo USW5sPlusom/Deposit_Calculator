@@ -13,11 +13,10 @@ def index():
 
         c = Calc(start, rate, years, monthly_deposit)
         end, profit, history = c.calc()
-        plot_url = c.generate_plot(history)
 
-        return render_template('base.html', end=end, profit=profit, plot_url=plot_url)
-    return render_template('base.html')
+        return render_template('index1.html', end=end, profit=profit)
+    return render_template('index1.html')
 @app.route('/next_page')
 def next_page():
-    return render_template('base2.html')
+    return render_template('index2.html')
 

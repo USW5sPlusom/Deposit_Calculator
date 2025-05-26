@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import io
 import base64
+from matplotlib.ticker import FuncFormatter
 
 class Calc:
     """
@@ -32,21 +33,6 @@ class Calc:
         profit = total - self.start - (self.monthly_deposit * months)
         return round(total, 2), round(profit, 2), history
 
-    def generate_plot(self, history):
-        """
-        Генерирует график роста суммы.
-        """
-        plt.figure(figsize=(8, 6))
-        plt.plot(history)
-        plt.xlabel('Месяцы')
-        plt.ylabel('Сумма')
-        plt.title('Рост суммы с учетом сложных процентов')
-        plt.grid(True)
-
-        img = io.BytesIO()
-        plt.savefig(img, format='png')
-        img.seek(0)
-        plot_url = base64.b64encode(img.getvalue()).decode('utf8')
-        plt.close()
-
-        return plot_url
+    
+    
+    

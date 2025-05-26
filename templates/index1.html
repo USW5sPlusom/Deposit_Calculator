@@ -4,16 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Калькулятор сложного процента</title>
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --neon-blue: #08f;
             --neon-purple: #a0f;
             --neon-pink: #f0f;
             --neon-green: #0f8;
+            --neon-accent: #ff00aa;
             --dark-bg: #0a0a12;
             --darker-bg: #050508;
             --card-bg: rgba(20, 20, 30, 0.7);
             --text-light: #f0f0ff;
+            --text-glow: 0 0 10px currentColor;
         }
 
         * {
@@ -23,7 +26,7 @@
         }
 
         body {
-            font-family: 'Segoe UI', sans-serif;
+            font-family: 'Exo 2', 'Segoe UI', sans-serif;
             background-color: var(--dark-bg);
             color: var(--text-light);
             min-height: 100vh;
@@ -71,6 +74,16 @@
             position: relative;
             overflow: hidden;
             transition: all 0.4s ease;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: card-appear 0.8s ease-out 0.3s forwards;
+        }
+
+        @keyframes card-appear {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .neon-card::before {
@@ -103,10 +116,11 @@
             font-size: 2.2rem;
             font-weight: 700;
             color: white;
-            text-shadow: 0 0 10px rgba(0, 136, 255, 0.5);
+            text-shadow: var(--text-glow);
             position: relative;
             display: inline-block;
             width: 100%;
+            letter-spacing: 1px;
         }
 
         h1::after {
@@ -136,6 +150,20 @@
         .input-group {
             margin-bottom: 1.5rem;
             position: relative;
+            opacity: 0;
+            transform: translateX(-20px);
+            transition: all 0.5s ease;
+        }
+
+        .input-group:nth-child(1) { transition-delay: 0.4s; }
+        .input-group:nth-child(2) { transition-delay: 0.5s; }
+        .input-group:nth-child(3) { transition-delay: 0.6s; }
+        .input-group:nth-child(4) { transition-delay: 0.7s; }
+
+        .neon-card:hover .input-group,
+        .neon-card.loaded .input-group {
+            opacity: 1;
+            transform: translateX(0);
         }
 
         .input-group label {
@@ -144,6 +172,12 @@
             font-size: 1rem;
             color: rgba(255, 255, 255, 0.8);
             font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .input-group:hover label {
+            color: var(--neon-green);
+            text-shadow: var(--text-glow);
         }
 
         .input-group input {
@@ -155,16 +189,19 @@
             color: white;
             font-size: 1rem;
             transition: all 0.3s ease;
+            font-family: 'Exo 2', sans-serif;
         }
 
         .input-group input:focus {
             outline: none;
             border-color: var(--neon-blue);
-            box-shadow: 0 0 10px rgba(0, 136, 255, 0.3);
+            box-shadow: 0 0 15px rgba(0, 136, 255, 0.5);
+            transform: translateY(-2px);
         }
 
         .input-group input::placeholder {
             color: rgba(255, 255, 255, 0.3);
+            font-family: 'Exo 2', sans-serif;
         }
 
         .btn {
@@ -182,6 +219,8 @@
             overflow: hidden;
             margin-top: 1rem;
             z-index: 1;
+            font-family: 'Exo 2', sans-serif;
+            letter-spacing: 0.5px;
         }
 
         .btn::before {
@@ -200,6 +239,7 @@
         .btn:hover {
             transform: translateY(-3px);
             box-shadow: 0 10px 20px rgba(0, 136, 255, 0.3);
+            letter-spacing: 1px;
         }
 
         .btn:hover::before {
@@ -245,6 +285,7 @@
             text-decoration: none;
             transition: all 0.3s ease;
             text-align: center;
+            font-family: 'Exo 2', sans-serif;
         }
 
         .next-button {
@@ -280,6 +321,7 @@
             pointer-events: none;
         }
 
+        /* Адаптивные стили */
         @media (max-width: 600px) {
             .calculator-container {
                 padding: 1rem;
@@ -287,10 +329,65 @@
             
             .neon-card {
                 padding: 1.5rem;
+                border-radius: 15px;
             }
             
             h1 {
                 font-size: 1.8rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .input-group {
+                margin-bottom: 1.2rem;
+            }
+
+            .input-group input {
+                padding: 0.8rem;
+            }
+
+            .btn {
+                padding: 0.9rem;
+                font-size: 1rem;
+            }
+
+            .result {
+                padding: 1rem;
+                font-size: 1rem;
+            }
+
+            .nav-button {
+                padding: 0.7rem 1.2rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .calculator-container {
+                padding: 0.5rem;
+            }
+            
+            .neon-card {
+                padding: 1rem;
+                border-radius: 12px;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+                margin-bottom: 1rem;
+            }
+
+            .input-group label {
+                font-size: 0.9rem;
+            }
+
+            .input-group input {
+                padding: 0.7rem;
+                font-size: 0.9rem;
+            }
+
+            .result {
+                font-size: 0.9rem;
+                padding: 0.8rem;
             }
         }
     </style>
@@ -300,7 +397,7 @@
     
     <div class="calculator-container">
         <div class="neon-card">
-            <h1>Neon Compound Calculator</h1>
+            <h1>Калькулятор сложного процента</h1>
             
             <form id="calculator-form">
                 <div class="input-group">
@@ -338,7 +435,7 @@
         // Плавающие частицы
         function createParticles() {
             const container = document.getElementById('particles');
-            const particleCount = Math.floor(window.innerWidth / 10);
+            const particleCount = Math.min(Math.floor(window.innerWidth / 10), 50); // Ограничиваем количество
             
             for (let i = 0; i < particleCount; i++) {
                 const particle = document.createElement('div');
@@ -410,22 +507,33 @@
                 return;
             }
             
-            // Расчет с ежемесячным пополнением
-            let total = initialAmount;
-            const monthlyRate = annualRate / 12;
-            const months = years * 12;
+            // Показываем анимацию загрузки
+            const btn = document.getElementById('calculate-btn');
+            btn.innerHTML = '<span>Расчет...</span>';
+            btn.disabled = true;
             
-            for (let i = 0; i < months; i++) {
-                total = total * (1 + monthlyRate) + monthlyDeposit;
-            }
-            
-            const profit = total - initialAmount - (monthlyDeposit * months);
-            
-            showResult(`
-                <strong>Итоговая сумма:</strong> ${total.toFixed(2)} руб.<br>
-                <strong>Прибыль:</strong> ${profit.toFixed(2)} руб.<br>
-                <strong>Всего вложено:</strong> ${(initialAmount + monthlyDeposit * months).toFixed(2)} руб.
-            `, true);
+            // Имитация загрузки для демонстрации анимации
+            setTimeout(() => {
+                // Расчет с ежемесячным пополнением
+                let total = initialAmount;
+                const monthlyRate = annualRate / 12;
+                const months = years * 12;
+                
+                for (let i = 0; i < months; i++) {
+                    total = total * (1 + monthlyRate) + monthlyDeposit;
+                }
+                
+                const profit = total - initialAmount - (monthlyDeposit * months);
+                
+                showResult(`
+                    <strong>Итоговая сумма:</strong> ${total.toFixed(2)} руб.<br>
+                    <strong>Прибыль:</strong> ${profit.toFixed(2)} руб.<br>
+                    <strong>Всего вложено:</strong> ${(initialAmount + monthlyDeposit * months).toFixed(2)} руб.
+                `, true);
+                
+                btn.innerHTML = '<span>Рассчитать снова</span>';
+                btn.disabled = false;
+            }, 800);
         }
         
         function showResult(message, success) {
@@ -445,16 +553,10 @@
         window.addEventListener('load', () => {
             createParticles();
             
-            // Анимация появления карточки
-            const card = document.querySelector('.neon-card');
-            card.style.opacity = '0';
-            card.style.transform = 'translateY(20px)';
-            
+            // Помечаем карточку как загруженную для анимации полей
             setTimeout(() => {
-                card.style.opacity = '1';
-                card.style.transform = 'translateY(0)';
-                card.style.transition = 'all 0.5s ease-out';
-            }, 100);
+                document.querySelector('.neon-card').classList.add('loaded');
+            }, 500);
         });
         
         // Адаптация частиц при изменении размера окна
